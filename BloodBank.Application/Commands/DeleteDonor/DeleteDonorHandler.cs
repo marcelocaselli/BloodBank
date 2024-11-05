@@ -1,28 +1,26 @@
-﻿using BancoDeSangue.Infrastructure.Persistence;
-using BloodBank.Application.Models;
+﻿using BloodBank.Application.Models;
+using BloodBank.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace BloodBank.Application.Commands.DeleteDonor
 {
     public class DeleteDonorHandler : IRequestHandler<DeleteDonorCommand, ResultViewModel>
     {
-        private readonly BloodBankDbContext _context;
-        public DeleteDonorHandler(BloodBankDbContext context)
+        private readonly IDonorRepository _repository;
+        public DeleteDonorHandler(IDonorRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         public async Task<ResultViewModel> Handle(DeleteDonorCommand request, CancellationToken cancellationToken)
         {
-            var donor = await _context.Donors.SingleOrDefaultAsync(x => x.Id == request.Id);
+            var donor = await _repository.GetById(request.Id);
 
             if (donor == null)
             {
                 return ResultViewModel.Error("Doador não localizado.");
             }
 
-            _context.Donors.Remove(donor);
-            await _context.SaveChangesAsync();
+            await _repository.Delete(donor.Id);
 
             return ResultViewModel.Success();
         }

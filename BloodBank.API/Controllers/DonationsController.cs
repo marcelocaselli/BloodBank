@@ -4,7 +4,6 @@ using BloodBank.Application.Commands.UpdateDonation;
 using BloodBank.Application.Queries.GetAllDonations;
 using BloodBank.Application.Queries.GetDonationById;
 using BloodBank.Application.Queries.GetDonationHistoryByDonor;
-using BloodBank.Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +13,9 @@ namespace BloodBank.API.Controllers
     [Route("api/donations")]
     public class DonationsController : ControllerBase
     {
-        private readonly IDonationService _service;
         private readonly IMediator _mediator;
-        public DonationsController(IDonationService service, IMediator mediator)
+        public DonationsController(IMediator mediator)
         {
-            _service = service;
             _mediator = mediator;
         }
 

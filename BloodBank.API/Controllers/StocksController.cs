@@ -1,7 +1,6 @@
 ﻿using BloodBank.Application.Commands.DeleteStock;
-using BloodBank.Application.Commands.UpdateStockCommand;
 using BloodBank.Application.Queries.GetAllStocks;
-using BloodBank.Application.Services;
+using BloodBank.Application.Queries.GetStockById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,11 +10,9 @@ namespace BloodBank.API.Controllers
     [Route("api/bloodstocks")]
     public class StockController : ControllerBase
     {
-        private readonly IStockService _service;
         private readonly IMediator _mediator;
-        public StockController(IStockService service, IMediator mediator)
+        public StockController(IMediator mediator)
         {
-            _service = service;
             _mediator = mediator;
         }
 
@@ -28,21 +25,20 @@ namespace BloodBank.API.Controllers
             return Ok(result);
         }
 
-
-        //Put api/bloodstocks/id
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, UpdateStockCommand command)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(new GetStockByIdQuery(id));
 
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Message);
             }
 
-            return NoContent();
+            return Ok(result);
         }
 
+                
         //Delete api/bloodstocks/id
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

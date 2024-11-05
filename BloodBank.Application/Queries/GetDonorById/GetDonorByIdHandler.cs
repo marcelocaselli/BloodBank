@@ -1,29 +1,19 @@
-﻿using Azure.Core;
-using BancoDeSangue.Infrastructure.Persistence;
-using BloodBank.Application.Models;
+﻿using BloodBank.Application.Models;
+using BloodBank.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BloodBank.Application.Queries.GetDonorById
 {
     public class GetDonorByIdHandler : IRequestHandler<GetDonorByIdQuery, ResultViewModel<DonorDetailViewModel>>
     {
-        private readonly BloodBankDbContext _context;
-        public GetDonorByIdHandler(BloodBankDbContext context)
+        private readonly IDonorRepository _repository;
+        public GetDonorByIdHandler(IDonorRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         public async Task<ResultViewModel<DonorDetailViewModel>> Handle(GetDonorByIdQuery request, CancellationToken cancellationToken)
         {
-            var donor = await _context.Donors
-               .Include(x => x.Address)
-            //.Include(x => x.Doacoes)                
-               .SingleOrDefaultAsync(x => x.Id == request.Id);
+            var donor = await _repository.GetById(request.Id);
 
             if (donor == null)
             {

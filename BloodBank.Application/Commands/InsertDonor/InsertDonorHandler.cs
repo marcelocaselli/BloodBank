@@ -1,20 +1,19 @@
-﻿using BancoDeSangue.Infrastructure.Persistence;
-using BloodBank.Application.Models;
+﻿using BloodBank.Application.Models;
+using BloodBank.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace BloodBank.Application.Commands.InsertDonor
 {
     public class InsertDonorHandler : IRequestHandler<InsertDonorCommand, ResultViewModel<int>>
     {
-        private readonly BloodBankDbContext _context;
-        public InsertDonorHandler(BloodBankDbContext context)
+        private readonly IDonorRepository _repository;
+        public InsertDonorHandler( IDonorRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         public async Task<ResultViewModel<int>> Handle(InsertDonorCommand request, CancellationToken cancellationToken)
         {
-            var donorEmailExist = await _context.Donors.FirstOrDefaultAsync(x => x.Email == request.Email);
+            var donorEmailExist = await _repository.GetByEmail(request.Email);
             if (donorEmailExist != null)
             {
                 return ResultViewModel<int>.Error("Email já cadastrado");
@@ -31,8 +30,7 @@ namespace BloodBank.Application.Commands.InsertDonor
                 request.RhFactor
             );
 
-            await _context.Donors.AddAsync(donor);
-            await _context.SaveChangesAsync();
+            await _repository.Add(donor);
 
             return ResultViewModel<int>.Success(donor.Id);
         }

@@ -1,6 +1,5 @@
-using BancoDeSangue.Infrastructure.Persistence;
 using BloodBank.Application;
-using Microsoft.EntityFrameworkCore;
+using BloodBank.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,12 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-var connectionString = builder.Configuration.GetConnectionString("BancoDeSangueCs");
-
-builder.Services.AddDbContext<BloodBankDbContext>(options => options.UseSqlServer(connectionString));
-
 builder.Services
-    .AddApplication();
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -3,7 +3,6 @@ using BloodBank.Application.Commands.InsertDonor;
 using BloodBank.Application.Commands.UpdateDonor;
 using BloodBank.Application.Queries.GetAllDonors;
 using BloodBank.Application.Queries.GetDonorById;
-using BloodBank.Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +12,9 @@ namespace BloodBank.API.Controllers
     [Route("api/donors")]
     public class DonorsController : ControllerBase
     {
-        private readonly IDonorService _service;
         private readonly IMediator _mediator;
-        public DonorsController(IDonorService service, IMediator mediator)
+        public DonorsController(IMediator mediator)
         {
-            _service = service;
             _mediator = mediator;
         }
         //Get api/donors?search=busca

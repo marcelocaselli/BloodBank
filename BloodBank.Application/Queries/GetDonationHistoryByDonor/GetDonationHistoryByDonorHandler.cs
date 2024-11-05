@@ -1,5 +1,6 @@
 ﻿using BancoDeSangue.Infrastructure.Persistence;
 using BloodBank.Application.Models;
+using BloodBank.Core.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,20 +9,24 @@ namespace BloodBank.Application.Queries.GetDonationHistoryByDonor
     public class GetDonationHistoryByDonorHandler : IRequestHandler<GetDonationHistoryByDonorQuery, ResultViewModel<List<DonationHistoryByDonorViewModel>>>
     {
         private readonly BloodBankDbContext _context;
-        public GetDonationHistoryByDonorHandler(BloodBankDbContext context)
+        private readonly IDonationRepository _repository;
+        public GetDonationHistoryByDonorHandler(BloodBankDbContext context, IDonationRepository repository)
         {
             _context = context;
+            _repository = repository;
         }
         public async Task<ResultViewModel<List<DonationHistoryByDonorViewModel>>> Handle(GetDonationHistoryByDonorQuery request, CancellationToken cancellationToken)
         {
             // Buscar o doador no banco e verificar se existe
-            var donor = await _context.Donors.SingleOrDefaultAsync(x => x.Id == request.Id);
+
+            var donor = await _repository.GetById(request.Id);
+            //var donor = await _context.Donors.SingleOrDefaultAsync(x => x.Id == request.Id);
             if (donor == null)
             {
                 return ResultViewModel<List<DonationHistoryByDonorViewModel>>.Error("Doador não existe");
             }
 
-            // Buscar todas as doações feitas pelo doador
+            //Buscar todas as doações feitas pelo doador
             var donations = await _context.Donations
                 .Where(x => x.IdDonor == request.Id)
                 .Select(x => new DonationHistoryByDonorViewModel
