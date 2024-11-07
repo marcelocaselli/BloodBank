@@ -1,5 +1,4 @@
-﻿using BloodBank.Application.Commands.DeleteStock;
-using BloodBank.Application.Queries.GetAllStocks;
+﻿using BloodBank.Application.Queries.GetAllStocks;
 using BloodBank.Application.Queries.GetStockById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -39,18 +38,18 @@ namespace BloodBank.API.Controllers
         }
 
                 
-        //Delete api/bloodstocks/id
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var result = await _mediator.Send(new DeleteStockCommand(id));
+        ////Delete api/bloodstocks/id
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> Delete(int id)
+        //{
+        //    var result = await _mediator.Send(new DeleteStockCommand(id));
 
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result.Message);
-            }
+        //    if (!result.IsSuccess)
+        //    {
+        //        return BadRequest(result.Message);
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
     }
 }

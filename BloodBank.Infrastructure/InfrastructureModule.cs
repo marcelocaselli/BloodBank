@@ -32,6 +32,7 @@ namespace BloodBank.Infrastructure
             services.AddScoped<IDonorRepository, DonorRepository>();
             services.AddScoped<IStockRepository, StockRepository>();
             services.AddScoped<IDonationRepository, DonationRepository>();
+            services.AddScoped<IBloodBankRepository, BloodBankRepository>();
 
             return services;
         }

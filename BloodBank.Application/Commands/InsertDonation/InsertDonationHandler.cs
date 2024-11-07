@@ -2,6 +2,7 @@
 using BloodBank.Application.Models;
 using BloodBank.Core.Entities;
 using BloodBank.Core.Repositories;
+using BloodBank.Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,38 +10,41 @@ namespace BloodBank.Application.Commands.InsertDonation
 {
     public class InsertDonationHandler : IRequestHandler<InsertDonationCommand, ResultViewModel<int>>
     {
-        private readonly BloodBankDbContext _context;
-        private readonly IDonorRepository _repository;
-        public InsertDonationHandler(BloodBankDbContext context, IDonorRepository repository)
+        private readonly IBloodBankRepository _repository;
+        public InsertDonationHandler(IBloodBankRepository repository)
         {
-            _context = context;
             _repository = repository;
         }
         public async Task<ResultViewModel<int>> Handle(InsertDonationCommand request, CancellationToken cancellationToken)
         {
-            var donation = new Donation(request.IdDonor, request.Volume, request.DonationDate);
-            // buscar no banco de dados o doador 
-            // verificar se existe no estoque o tipo sanguineo
-            // se não existir, criar o estoque ou se existir atualizar o estoque
+            // Passo 1: Buscar o doador pelo ID
+            var donor = await _repository.GetDonorById(request.IdDonor);
+            if (donor == null)
+            {
+                return ResultViewModel<int>.Error("Doador não encontrado.");
+            }
 
-            //var donor = await _context.Donors.SingleOrDefaultAsync(x => x.Id == request.IdDonor);
+            // Passo 2: Criar uma nova doação
+            var donation = new Donation(donor.Id, request.Volume, request.DonationDate);
 
-            var donor = await _repository.GetById(request.IdDonor);
-
-            var stock = await _context.Stocks.SingleOrDefaultAsync(x => x.BloodType == donor.BloodType && x.RhFactor == donor.RhFactor);
+            // Passo 3: Verificar o estoque para o tipo sanguíneo do doador
+            var stock = await _repository.GetStockByBloodType(donor.BloodType, donor.RhFactor);
 
             if (stock == null)
             {
+                // Criar novo estoque caso não exista
                 stock = new Stock(donor.BloodType, donor.RhFactor, donation.Volume);
-                _context.Stocks.Add(stock);
+                await _repository.AddStock(stock);
             }
             else
             {
+                // Atualizar o estoque existente
                 stock.UpdateStock(donation.Volume);
+                await _repository.UpdateStock(stock);
             }
 
-            await _context.Donations.AddAsync(donation);
-            await _context.SaveChangesAsync();
+            // Passo 4: Registrar a doação
+            await _repository.AddDonation(donation);
 
             return ResultViewModel<int>.Success(donation.Id);
         }

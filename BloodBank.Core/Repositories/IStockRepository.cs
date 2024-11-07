@@ -6,6 +6,6 @@ namespace BloodBank.Core.Repositories
     {
         Task<List<Stock>> GetAll();
         Task<Stock?> GetById(int id);
-        Task Delete(int id);
+        
     }
 }

@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using BancoDeSangue.Infrastructure.Persistence;
+﻿using BancoDeSangue.Infrastructure.Persistence;
 using BloodBank.Core.Entities;
 using BloodBank.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -26,12 +25,12 @@ namespace BloodBank.Infrastructure.Persistence.Repositories
             return await _context.Stocks.SingleOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task Delete(int id)
-        {
-            var stock = await _context.Stocks.SingleOrDefaultAsync(x => x.Id == id);
+        //public async Task Delete(int id)
+        //{
+        //    var stock = await _context.Stocks.SingleOrDefaultAsync(x => x.Id == id);
 
-            _context.Stocks.Remove(stock);
-            await _context.SaveChangesAsync();
-        }
+        //    _context.Stocks.Remove(stock);
+        //    await _context.SaveChangesAsync();
+        //}
     }
 }
